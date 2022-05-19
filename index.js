@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const multer = require('multer');
-const { s3Uploadv2 } = require('./s3Service');
+const { s3Uploadv2, s3Uploadv3 } = require('./s3Service');
 const uuid = require('uuid').v4;
 require('dotenv').config();
 
@@ -65,11 +65,54 @@ const upload = multer({
     limits: { fileSize: 100000000, files: 2 }
 });
 
+
+
+
+
+// upload only one file
+// app.post("/upload", upload.array('file'), async (req, res) => {
+//     const file = req.files[0];
+//     const result = await s3Uploadv2(file);
+//     res.json({ status: "success", result });
+// });
+
+// upload multiple files
+// app.post("/upload", upload.array('file'), async (req, res) => {
+//     try {
+//         const results = await s3Uploadv2(req.files);
+//         console.log(results);
+//         res.json({ status: "success", results });
+//     } catch (err) {
+//         console.log(err);
+//     }
+// });
+
+
+// S3 version upload 1 file
+// app.post("/upload", upload.array('file'), async (req, res) => {
+//     const file = req.files[0];
+//     try {
+//         const results = await s3Uploadv3(file);
+//         console.log(results);
+//         res.json({ status: "success", results });
+//     } catch (err) {
+//         console.log(err);
+//     }
+// });
+
+// S3 version upload multiple files
 app.post("/upload", upload.array('file'), async (req, res) => {
-    const file = req.files[0];
-    const result = await s3Uploadv2(file);
-    res.json({ status: "success", result });
+    try {
+        const results = await s3Uploadv3(req.files);
+        console.log(results);
+        res.json({ status: "success", results });
+    } catch (err) {
+        console.log(err);
+    }
 });
+
+
+
 
 // set multer upload errors
 app.use((error, req, res, next) => {
